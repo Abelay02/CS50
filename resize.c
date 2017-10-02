@@ -21,7 +21,6 @@ int main(int argc, char *argv[])
     char *infile = argv[2];
     char *outfile = argv[3];
 
-    printf("%i\n", n);
 
     if (n >= 100 || n < 1)
     {
@@ -93,8 +92,9 @@ int main(int argc, char *argv[])
 
             if (y != 0)
             {
-                fseek(inptr, (-3 * OldWidth), SEEK_CUR);
+                fseek(inptr, (-3 * OldWidth + padding), SEEK_CUR);
             }
+
 
             // iterate over pixels in scanline
             for (int j = 0; j < OldWidth; j++)
@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
             {
                 fputc(0x00, outptr);
             }
+
         }
     }
 
