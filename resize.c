@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     bi.biWidth = bi.biWidth * n;
     bi.biHeight = bi.biHeight * n;
 
-    int newpadding = (4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4;
+    int newpadding = ((4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4);
 
 
     bi.biSizeImage = (bi.biWidth * abs(bi.biHeight)) * sizeof(RGBTRIPLE) + newpadding;
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
             if (y != 0)
             {
-                fseek(inptr, (-3 * OldWidth + padding), SEEK_CUR);
+                fseek(inptr, (-3 * OldWidth - padding), SEEK_CUR);
             }
 
 
