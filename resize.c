@@ -69,13 +69,14 @@ int main(int argc, char *argv[])
     int OldWidth = bi.biWidth;
     int OldHeight = abs(bi.biHeight);
 
+    //new values for height and width in the outfile
     bi.biWidth = bi.biWidth * n;
     bi.biHeight = bi.biHeight * n;
 
     int newpadding = ((4 - (bi.biWidth * sizeof(RGBTRIPLE)) % 4) % 4);
 
 
-    bi.biSizeImage = (bi.biWidth * abs(bi.biHeight)) * sizeof(RGBTRIPLE) + newpadding;
+    bi.biSizeImage = ((bi.biWidth) * abs(bi.biHeight)) * sizeof(RGBTRIPLE) + (newpadding * abs(bi.biHeight));
     bf.bfSize = bi.biSizeImage + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
     // write outfile's BITMAPFILEHEADER
@@ -87,9 +88,11 @@ int main(int argc, char *argv[])
     // iterate over infile's scanlines
     for (int i = 0; i < OldHeight; i++)
     {
+        //writing the horizontal scanline multiple times vertically
         for (int y = 0; y < n; y++)
         {
 
+            //moves the cursor back to the beginning of the scanline
             if (y != 0)
             {
                 fseek(inptr, (-3 * OldWidth - padding), SEEK_CUR);
@@ -105,6 +108,7 @@ int main(int argc, char *argv[])
                 // read RGB triple from infile
                 fread(&triple, sizeof(RGBTRIPLE), 1, inptr);
 
+                //writes each pixel n times
                 for (int x = 0; x < n; x++)
                 {
                     // write RGB triple to outfile
