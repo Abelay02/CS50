@@ -4,30 +4,26 @@
 
     <div class="col">
         <form action="/compare" enctype="multipart/form-data" method="post">
-            <div class="form-group">
+            <div>
                 <input name="file1" type="file" class="form-control-file">
             </div>
-            <div class="form-group">
+            <div>
                 <input name="file2" type="file" class="form-control-file">
             </div>
-            <div class="form-group">
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" name="algorithm" value="lines" class="form-check-input" /> lines
-                    </label>
+            <div>
+                <div>
+                    <input type="radio" name="algorithm" value="lines" class="form-check-input" /> lines
                 </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" name="algorithm" value="sentences" class="form-check-input" /> sentences
-                    </label>
+                <div>
+                    <input type="radio" name="algorithm" value="sentences" class="form-check-input" /> sentences
                 </div>
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="radio" name="algoritm" value="substrings" class="form-check-input" /> substrings
-                        <input name="length" class="form-control form-control-sm" type="number" min="1" placeholder="of length n" />
-                    </label>
+                <div>
+                    <input type="radio" name="algoritm" value="substrings" class="form-check-input" /> substrings
                 </div>
-                <button class="btn btn-default" type="submit"> compare
+                <div>
+                    <input type="number" name"length" class="form-control-sm" min="1" placeholder="of length n" />
+                </div>
+                <button name="button" type="submit"> compare
                 </button>
             </div>
         </form>
