@@ -49,6 +49,7 @@ def index():
 
     for row in rows:
 
+        # filling index with data from the portfolio
         data = lookup(row["symbol"])
         row["name"] = data["name"]
         row["price"] = usd(data["price"])
@@ -73,7 +74,7 @@ def buy():
         data = lookup(request.form.get("symbol"))
 
         if not shares.isdigit():
-            return apology("hello", 400)
+            return apology("no shares input", 400)
 
         if not symbol:
             return apology("not a valid stock symbol", 400)
@@ -84,6 +85,7 @@ def buy():
         if not data:
             return apology("not a valid stock symbol", 400)
 
+        # ensure that user has enough money
         cost = data["price"] * float(shares)
         cash = db.execute("SELECT cash FROM users WHERE id =:userid",
                           userid=session["user_id"])[0]["cash"]
@@ -94,18 +96,22 @@ def buy():
         shareRows = db.execute("SELECT shares FROM portfolio WHERE id=:userid AND symbol=:symbol",
                                userid=session["user_id"], symbol=data["symbol"])
 
+        # if the user doesn't own any of a given stock
         if len(shareRows) == 0:
             db.execute("INSERT INTO portfolio (id, symbol, shares) VALUES (:userid, :symbol, :shares)",
                        userid=session["user_id"], symbol=data["symbol"], shares=shares)
 
+        # if the user does have at least one of a given stock
         else:
             NumSharesOwn = shareRows[0]["shares"]
             db.execute("UPDATE portfolio SET shares=:shares WHERE id=:userid AND symbol=:symbol",
                        shares=NumSharesOwn + int(shares), userid=session["user_id"], symbol=data["symbol"])
 
+        # updating cash in users
         db.execute("UPDATE users SET cash=:cash WHERE id=:userid",
                    cash=cash - cost, userid=session["user_id"])
 
+        # noting all transaction info, putting it into transactions table
         time = "{:%Y/%m/%d %H:%M:%S}".format(datetime.now())
         db.execute("INSERT INTO transactions (id, symbol, shares, price, type, time) VALUES (:userid, :symbol, :shares, :price, :ttype, :time)",
                    userid=session["user_id"], symbol=data["symbol"], shares=shares, price=data["price"], ttype="purchase", time=time)
@@ -238,11 +244,13 @@ def register():
 
         rows = db.execute("SELECT * FROM users WHERE username = :username", username=username)
 
+        # makes sure that a username is not being used
         if len(rows) != 0:
             return apology("username already taken", 400)
 
         hashpass = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
 
+        # creating the user profile in users
         db.execute("INSERT INTO users (username, hash) VALUES (:username, :password)",
                    username=username, password=hashpass)
 
@@ -287,10 +295,12 @@ def sell():
                                userid=session["user_id"], symbol=data["symbol"])
         NumSharesOwn = shareRows[0]["shares"]
 
+        # make sure user has more stock than they are trying to sell
         if int(shares) > NumSharesOwn:
             return apology("not enough shares owned", 400)
 
         else:
+            # updating number of shares owned after selling
             db.execute("UPDATE portfolio SET shares=:shares WHERE id=:userid AND symbol=:symbol",
                        shares=NumSharesOwn - int(shares), userid=session["user_id"], symbol=data["symbol"])
 
@@ -298,13 +308,16 @@ def sell():
         shareRows = db.execute("SELECT shares FROM portfolio WHERE id=:userid AND symbol=:symbol",
                                userid=session["user_id"], symbol=data["symbol"])
 
+        # removing entry from portfolio when number of shares owned drops to 0
         if newshares == 0:
             db.execute("DELETE FROM portfolio WHERE id=:userid AND symbol=:symbol",
                        userid=session["user_id"], symbol=data["symbol"])
 
+        # updating cash in users
         db.execute("UPDATE users SET cash=:cash WHERE id=:userid",
                    cash=cash + cost, userid=session["user_id"])
 
+        # marking the transaction
         time = "{:%Y/%m/%d %H:%M:%S}".format(datetime.now())
         db.execute("INSERT INTO transactions (id, symbol, shares, price, type, time) VALUES (:userid, :symbol, :shares, :price, :ttype, :time)",
                    userid=session["user_id"], symbol=data["symbol"], shares=shares, price=data["price"], ttype="sale", time=time)
