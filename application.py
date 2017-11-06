@@ -194,15 +194,16 @@ def register():
 
         username, password, confirmation = request.form.get("username"), request.form.get("password"), request.form.get("confirmation")
 
-        # attempting to make sure that password has at least one punctuation
-        #punct = False
-        #x = len(password)
-        #for i in x:
-        #    if password[i].ispunct():
-        #        punct = True
+        # password must have at least one digit!
+        digit = False
+        length = len(password)
+        for i in range(length):
+            character = password[i]
+            if character.isdigit():
+                digit = True
 
-        #if punct == False:
-         #   return apology("password must have at least one punctuation", 400)
+        if digit == False:
+            return apology("password must have at least one digit", 400)
 
 
         if not username:
