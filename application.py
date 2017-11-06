@@ -67,7 +67,6 @@ def buy():
         if not shares.isdigit():
             return apology("hello", 400)
 
-
         if not symbol:
             return apology("not a valid stock symbol", 400)
 
@@ -79,7 +78,6 @@ def buy():
 
         cost = data["price"]*float(shares)
         cash = db.execute("SELECT cash FROM users WHERE id =:userid", userid = session["user_id"])[0]["cash"]
-
 
         if cost > cash:
             return apology("Get your money up", 400)
@@ -104,8 +102,6 @@ def buy():
 @app.route("/history")
 @login_required
 def history():
-    #cash = db.execute("SELECT cash FROM users WHERE id=:userid", userid=session["user_id"])[0]["cash"]
-    #total = cash
 
     rows = db.execute("SELECT * FROM transactions WHERE id=:userid", userid=session["user_id"])
 
@@ -173,6 +169,7 @@ def logout():
 def quote():
     """Get stock quote."""
 
+    #gives the user the form to request a stock quote
     if request.method == "GET":
         return render_template("quote.html")
 
@@ -182,29 +179,30 @@ def quote():
         if data is None:
             return apology("invalid symbol")
 
+        #tells user how much the stock is worth
         message = "One {} share ({}) is worth {}".format(data["name"], data["symbol"], usd(data["price"]))
         return render_template("quoted.html", message=message)
-
-
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
     if request.method == "POST":
 
-        username, password, confirmation = request.form.get("username"), request.form.get("password"), request.form.get("confirmation")
+        username = request.form.get("username")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
 
-        # password must have at least one digit!
+        # ensures that password must have at least one digit!
         digit = False
         length = len(password)
         for i in range(length):
             character = password[i]
+
             if character.isdigit():
                 digit = True
 
         if digit == False:
             return apology("password must have at least one digit", 400)
-
 
         if not username:
             return apology("no username input", 400)
